@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
         textSalida = findViewById(R.id.textSalida);
     }
 
+    // Speech to Text
+
     private void pushToTalk() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         String language = "en-GB";
@@ -84,24 +86,32 @@ public class MainActivity extends AppCompatActivity {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null!= data) {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    //Falta el
-                    String operation[] = result.get(0).split(" ");
-                    operador1 = Float.parseFloat(operation[1]);
-                    operador2 = Float.parseFloat(operation[2]);
-                    if(operation[1].equals("plus")) {
+
+                    String operation[] = String.valueOf(result.get(0)).split(" ");
+                    operador1 = Float.parseFloat(operation[1].toString());
+                    operacion = operation[1];
+                    operador2 = Float.parseFloat(operation[2].toString());
+
+                    if(operacion.equals("+")) {
                         acc = operador1 + operador2;
                     }
-                    else if(operation[1].equals("minus")) {
+                    else if(operacion.equals("-")) {
                         acc = operador1 - operador2;
                     }
-                    else if(operation[1].equals("times")) {
+                    else if(operacion.equals("*")) {
                         acc = operador1 * operador2;
                     }
-                    else if(operation[1].equals("divided by")) {
+                    else if(operacion.equals("/")) {
+                        if(operador2 == 0) {
+                            textSalida.setText("Error");
+                        }
                         acc = operador1 / operador2;
                     }
                     //textSalida.setText(String.valueOf(acc));
-                    textSalida.setText(operation[0]);
+                    tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
+                    operador1 = 0.0f;
+                    operador2 = 0.0f;
+                    operacion = "";
                     bflag = true;
                 }
                 break;
@@ -182,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         textSalida.setText(textSalida.getText() + "9");
     }
 
+    //Operadores & Operaciones
     public void btDot(View view) {
         if( bflag == true ) {
             textSalida.setText(".");
@@ -240,27 +251,21 @@ public class MainActivity extends AppCompatActivity {
 
             if(operacion.equals("+")) {
                 acc = operador1 + operador2;
-                textSalida.setText(String.valueOf(acc));
-                tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
             }
             else if(operacion.equals("-")) {
                 acc = operador1 - operador2;
-                textSalida.setText(String.valueOf(acc));
-                tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
             }
             else if(operacion.equals("*")) {
                 acc = operador1 * operador2;
-                textSalida.setText(String.valueOf(acc));
-                tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
             }
             else if(operacion.equals("/")) {
                 if(operador2 == 0) {
                     textSalida.setText("Error");
                 }
                 acc = operador1 / operador2;
-                textSalida.setText(String.valueOf(acc));
-                tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
             }
+            textSalida.setText(String.valueOf(acc));
+            tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
             operador1 = 0.0f;
             operador2 = 0.0f;
             operacion = "";
