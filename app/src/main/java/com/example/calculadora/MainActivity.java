@@ -87,8 +87,10 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK && null!= data) {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
-                    String operation[] = String.valueOf(result.get(0)).split(" ");
-                    operador1 = Float.parseFloat(operation[1].toString());
+
+                    String aux = String.valueOf(result.get(0));
+                    String operation[] = aux.split(" ");
+                    operador1 = Float.parseFloat(operation[0].toString());
                     operacion = operation[1];
                     operador2 = Float.parseFloat(operation[2].toString());
 
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         acc = operador1 / operador2;
                     }
-                    //textSalida.setText(String.valueOf(acc));
+                    textSalida.setText(String.valueOf(acc));
                     tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
                     operador1 = 0.0f;
                     operador2 = 0.0f;
