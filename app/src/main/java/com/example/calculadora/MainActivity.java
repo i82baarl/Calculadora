@@ -2,13 +2,13 @@ package com.example.calculadora;
 
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,9 +21,12 @@ public class MainActivity extends AppCompatActivity {
     TextView textSalida;
     float operador1 = 0.0f, operador2 = 0.0f, acc = 0.0f;
     String operacion = "";
-    Boolean bflag = false, nflag = false;
+    Boolean bflag = false; // Flag para borrar el accumulador
+    Boolean nflag = false; // Flag para negar un numero
+    Boolean mflag = false; // Flag para el mute del tts
     TextToSpeech tts;
     ImageButton sttButton;
+    ImageView muteButton;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
     @Override
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         //SpeechToText
 
         sttButton = findViewById(R.id.btVoice);
-
+        muteButton =(ImageView)findViewById(R.id.btMute);
         sttButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -293,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void btIgual(View view) {
 
-        if(textSalida.getText().toString().length() > 0) {
+        if(textSalida.getText().toString().length() > 0 && nflag == false) {
             operador2 = Float.parseFloat(textSalida.getText().toString());
 
             if(operacion.equals("+")) {
@@ -312,7 +315,9 @@ public class MainActivity extends AppCompatActivity {
                 acc = operador1 / operador2;
             }
             textSalida.setText(String.valueOf(acc));
-            tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
+            if(mflag == false) {
+                tts.speak(String.valueOf(acc), TextToSpeech.QUEUE_FLUSH, null);
+            }
             operador1 = 0.0f;
             operador2 = 0.0f;
             operacion = "";
@@ -325,6 +330,16 @@ public class MainActivity extends AppCompatActivity {
             String cadena = textSalida.getText().toString();
             cadena = cadena.substring(0, cadena.length() - 1);
             textSalida.setText(cadena);
+        }
+    }
+    public void btMute(View view) {
+        if(mflag == false) {
+            muteButton.setImageResource(R.drawable.mute);
+            mflag = true;
+        }
+        else {
+            muteButton.setImageResource(R.drawable.mute_off);
+            mflag = false;
         }
     }
 
