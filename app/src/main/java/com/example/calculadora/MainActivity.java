@@ -12,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     String operacion = "";
     Boolean bflag = false;
     TextToSpeech tts;
-    ImageButton stt;
+    ImageButton sttButton;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
     @Override
@@ -34,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             public void onInit(int status) {
                 if(status == TextToSpeech.SUCCESS) {
-                    int result = tts.setLanguage(Locale.ENGLISH);
+                    Locale locSpanish = new Locale("es", "ES");
+                    int result = tts.setLanguage(locSpanish);
                     if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                         tts.setLanguage(Locale.ENGLISH);
                     }
@@ -44,16 +44,14 @@ public class MainActivity extends AppCompatActivity {
 
         //SpeechToText
 
-        stt = findViewById(R.id.btVoice);
+        sttButton = findViewById(R.id.btVoice);
 
-        stt.setOnClickListener(new View.OnClickListener() {
+        sttButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 pushToTalk();
             }
         });
-
-        //
 
         textSalida = findViewById(R.id.textSalida);
     }
@@ -64,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         String language = "en-GB";
         String mathExpression = "([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+)(\\s*(plus|minus|times|divided by|multiply by|divide by|add|subtract|multiply|divide)\\s*([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+))*";
+        //String mathExpression = "([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+)(\\s*(más|menos|por|dividido|multiplicado por|dividido por)\\s*([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+))*";
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Di tu operación...");
         intent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, true);
@@ -93,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                     operador1 = Float.parseFloat(operation[0].toString());
                     operacion = operation[1];
                     operador2 = Float.parseFloat(operation[2].toString());
-
                     if(operacion.equals("+")) {
                         acc = operador1 + operador2;
                     }
