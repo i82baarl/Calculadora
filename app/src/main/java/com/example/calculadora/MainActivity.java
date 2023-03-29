@@ -16,10 +16,12 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+    String language = "es_ES";
     TextView textSalida;
     float operador1 = 0.0f, operador2 = 0.0f, acc = 0.0f;
     String operacion = "";
-    Boolean bflag = false;
+    Boolean bflag = false, nflag = false;
     TextToSpeech tts;
     ImageButton sttButton;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
@@ -59,21 +61,32 @@ public class MainActivity extends AppCompatActivity {
     // Speech to Text
 
     private void pushToTalk() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        String language = "en-GB";
-        String mathExpression = "([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+)(\\s*(plus|minus|times|divided by|multiply by|divide by|add|subtract|multiply|divide)\\s*([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+))*";
-        //String mathExpression = "([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+)(\\s*(más|menos|por|dividido|multiplicado por|dividido por)\\s*([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+))*";
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Di tu operación...");
-        intent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, true);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 4000);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 4000);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, mathExpression);
+
+        Intent recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
+        String mathExpression = "([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+)" +
+                "(\\s*(más|menos|por|dividido|multiplicado por|dividido por)\\s*" +
+                "([0-9]+[\\.\\,][0-9]*|[0-9]*[\\.\\,][0-9]+|[0-9]+))*";
+
+        String lang = null;
+        String country = null;
+        if (language != null) {
+            lang = language.substring(0, language.lastIndexOf("_"));
+            country = language.substring(language.lastIndexOf("_") + 1, language.length()).toUpperCase();
+        }
+
+        Locale locale = new Locale(lang, country);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, locale);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, locale);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, locale);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, locale);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_RESULTS, locale);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, mathExpression);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Di tu operación...");
 
         try {
             // no error
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+            startActivityForResult(recognizerIntent, REQ_CODE_SPEECH_INPUT);
         } catch (Exception e) {
             Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -88,6 +101,19 @@ public class MainActivity extends AppCompatActivity {
 
 
                     String aux = String.valueOf(result.get(0));
+
+                    /*aux.replaceAll("cero","0").replaceAll("uno","1").replaceAll("dos", "2")
+                        .replaceAll("tres", "3").replaceAll("cuatro", "4").replaceAll("cinco","5")
+                        .replaceAll("seis", "6").replaceAll("siete", "7").replaceAll("ocho","8")
+                        .replaceAll("nueve", "9").replaceAll("diez", "10").replaceAll("once","11")
+                        .replaceAll( "doce","12").replaceAll("trece","13").replaceAll("catorce","14")
+                        .replaceAll("quince","15").replaceAll("dieciseis","16").replaceAll("diecisiete","17")
+                        .replaceAll("dieciocho","18").replaceAll("diecinueve","19").replaceAll("veinte","20")
+                        .replaceAll("treinta","30").replaceAll("cuarenta","40").replaceAll("cincuenta","50")
+                        .replaceAll("sesenta","60").replaceAll("setenta","70").replaceAll("ochenta","80")
+                        .replaceAll("noventa","90").replaceAll("cien", "100").replaceAll("más","+")
+                        .replaceAll("menos","-").replaceAll("por","*").replaceAll("entre","/");*/
+
                     String operation[] = aux.split(" ");
                     operador1 = Float.parseFloat(operation[0].toString());
                     operacion = operation[1];
@@ -127,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "0");
+        nflag = false;
     }
     public void bt1 (View view) {
         if( bflag == true ) {
@@ -134,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "1");
+        nflag = false;
     }
     public void bt2 (View view) {
         if( bflag == true ) {
@@ -141,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "2");
+        nflag = false;
     }
     public void bt3 (View view) {
         if( bflag == true ) {
@@ -148,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "3");
+        nflag = false;
     }
     public void bt4 (View view) {
         if( bflag == true ) {
@@ -155,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "4");
+        nflag = false;
     }
     public void bt5 (View view) {
         if( bflag == true ) {
@@ -162,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "5");
+        nflag = false;
     }
     public void bt6 (View view) {
         if( bflag == true ) {
@@ -169,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "6");
+        nflag = false;
     }
     public void bt7 (View view) {
         if( bflag == true ) {
@@ -176,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "7");
+        nflag = false;
     }
     public void bt8 (View view) {
         if( bflag == true ) {
@@ -183,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "8");
+        nflag = false;
     }
     public void bt9 (View view) {
         if( bflag == true ) {
@@ -190,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
             bflag = false;
         }
         textSalida.setText(textSalida.getText() + "9");
+        nflag = false;
     }
 
     //Operadores & Operaciones
@@ -206,21 +242,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void btMult(View view) {
-        if(operacion == "" && textSalida.getText().toString().length() > 0) {
+        if(textSalida.getText().toString().equals("-")) {
+
+        }
+        else if(operacion == "" && textSalida.getText().toString().length() > 0 && nflag == false) {
             operador1 = Float.parseFloat(textSalida.getText().toString());
             operacion = "*";
             textSalida.setText("");
         }
     }
     public void btDiv(View view) {
-        if(operacion == "" && textSalida.getText().toString().length() > 0) {
+        if(textSalida.getText().toString().equals("-")) {
+
+        }
+        else if(operacion == "" && textSalida.getText().toString().length() > 0 && nflag == false) {
             operador1 = Float.parseFloat(textSalida.getText().toString());
             operacion = "/";
             textSalida.setText("");
         }
     }
     public void btSuma(View view) {
-        if(operacion == "" && textSalida.getText().toString().length() > 0) {
+        if(textSalida.getText().toString().equals("-")) {
+        }
+        else if(operacion == "" && textSalida.getText().toString().length() > 0 && nflag == false) {
             operador1 = Float.parseFloat(textSalida.getText().toString());
             operacion = "+";
             textSalida.setText("");
@@ -228,10 +272,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void btResta(View view) {
-        if (textSalida.getText().toString().equals("")) {
-            textSalida.setText("-");
+        if(textSalida.getText().toString().equals("-")) {
         }
-        else if(operacion == "" && textSalida.getText().toString().length() > 0) {
+        else if (textSalida.getText().toString().equals("")) {
+            textSalida.setText("-");
+            nflag = true;
+        }
+        else if(operacion == "" && textSalida.getText().toString().length() > 0 && nflag == false) {
             operador1 = Float.parseFloat(textSalida.getText().toString());
             operacion = "-";
             textSalida.setText("");
